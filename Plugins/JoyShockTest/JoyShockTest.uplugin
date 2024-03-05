@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "JoyShockTest",
+	"Description": "won't woooork! lol, unhandled exception we go!",
+	"Category": "Other",
+	"CreatedBy": "Ninni",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "JoyShockTest",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
