@@ -10,7 +10,8 @@ public class JoyShockTest : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				// ... add public include paths required here ...
+				"Runtime/Engine/Classes/Kismet",
+                "UObject"
 			}
 			);
 				
@@ -36,8 +37,11 @@ public class JoyShockTest : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				// ... add private dependencies that you statically link with here ...	
-			}
+                "CoreUObject",
+                "Engine",
+                "Slate",
+                "SlateCore"
+            }
 			);
 		
 		
