@@ -10,8 +10,7 @@ public class JoyShockTest : ModuleRules
 		
 		PublicIncludePaths.AddRange(
 			new string[] {
-				"Runtime/Engine/Classes/Kismet",
-                "UObject"
+				"Runtime/Engine/Classes/Kismet"
 			}
 			);
 				

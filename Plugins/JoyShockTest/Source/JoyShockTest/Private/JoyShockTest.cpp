@@ -4,7 +4,7 @@
 #include "Core.h"
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
-#include "JoyShockTestLibrary/JoyShockLibrary.h"
+#include "JoyShockLibrary.h"
 #include "Text.h"
 #include "string"
 DEFINE_LOG_CATEGORY(JoyShockPlugin);
@@ -21,7 +21,7 @@ void FJoyShockTestModule::StartupModule()
 	// Add on the relative location of the third party dll and load it
 	FString LibraryPath;
 #if PLATFORM_WINDOWS
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/JoyShockTestLibrary/Win64/JoyShockLibrary.dll"));
+	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/JoyShockLibrary.dll"));
 #endif // PLATFORM_WINDOWS
 
 	ExampleLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;
@@ -36,7 +36,7 @@ void FJoyShockTestModule::StartupModule()
 		}
 		else
 		{
-			UE_LOG(JoyShockPlugin, Display, TEXT("Numero controller: %d"), x);	
+			UE_LOG(JoyShockPlugin, Display, TEXT("Numero controller: %d"), x);
 		}
 		
 	}
