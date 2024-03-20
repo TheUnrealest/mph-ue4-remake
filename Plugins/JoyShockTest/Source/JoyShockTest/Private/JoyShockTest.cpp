@@ -5,8 +5,6 @@
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include "JoyShockLibrary.h"
-#include "Text.h"
-#include "string"
 DEFINE_LOG_CATEGORY(JoyShockPlugin);
 #define LOCTEXT_NAMESPACE "FJoyShockTestModule"
 

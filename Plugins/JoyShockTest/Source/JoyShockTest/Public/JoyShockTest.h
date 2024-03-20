@@ -3,6 +3,10 @@
 #pragma once
 
 #include "Modules/ModuleManager.h"
+
+#define JOYSHOCK_DEBUG true		// Cambialo per attivare/disattivare funzionalità di debug.
+								// Se impostato su false, il preprocessore spoglierà dal codice tutte le funzionalità di debug.
+
 DECLARE_LOG_CATEGORY_EXTERN(JoyShockPlugin, Display, All);
 
 class FJoyShockTestModule : public IModuleInterface
