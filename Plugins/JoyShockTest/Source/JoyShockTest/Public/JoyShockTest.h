@@ -4,8 +4,10 @@
 
 #include "Modules/ModuleManager.h"
 
-#define JOYSHOCK_DEBUG true		// Cambialo per attivare/disattivare funzionalità di debug.
-								// Se impostato su false, il preprocessore spoglierà dal codice tutte le funzionalità di debug.
+#define JOYSHOCK_DEBUG true	// Cambialo per attivare/disattivare funzionalità di debug.
+							// Se impostato su false, il preprocessore spoglierà dal codice tutte le funzionalità di debug.
+
+#define JOYSHOCK_STARTUPCONNECT true	// Connetti i Joy-Con all'avvio del plugin. O all'avvio dell'editor, decidi tu.
 
 DECLARE_LOG_CATEGORY_EXTERN(JoyShockPlugin, Display, All);
 

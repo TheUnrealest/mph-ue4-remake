@@ -26,7 +26,7 @@ public class JoyShockTest : ModuleRules
 			new string[]
 			{
 				"Core",
-				"JoyShockTestLibrary",
+                "JoyShockTestLibrary",
 				"Projects"
 				// ... add other public dependencies that you statically link with here ...
 			}
@@ -50,5 +50,6 @@ public class JoyShockTest : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
-	}
+
+    }
 }

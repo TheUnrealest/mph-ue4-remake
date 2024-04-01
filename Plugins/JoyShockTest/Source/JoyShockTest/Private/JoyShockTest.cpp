@@ -5,6 +5,7 @@
 #include "Modules/ModuleManager.h"
 #include "Interfaces/IPluginManager.h"
 #include "JoyShockLibrary.h"
+
 DEFINE_LOG_CATEGORY(JoyShockPlugin);
 #define LOCTEXT_NAMESPACE "FJoyShockTestModule"
 
@@ -26,7 +27,11 @@ void FJoyShockTestModule::StartupModule()
 
 	if (ExampleLibraryHandle)
 	{
-		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("heheheha", "clash royale laugh emote"));
+#if JOYSHOCK_DEBUG
+		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("HI", "heheheha")); // Mostra solo se debug attivo. Heheheha!
+#endif
+		
+#if JOYSHOCK_STARTUPCONNECT // Vogliamo anche connettere i Joy-Con all'avvio dell'editor?
 		int x = JslConnectDevices();
 		if (x == 0)
 		{
@@ -36,6 +41,7 @@ void FJoyShockTestModule::StartupModule()
 		{
 			UE_LOG(JoyShockPlugin, Display, TEXT("Numero controller: %d"), x);
 		}
+#endif
 		
 	}
 	else
