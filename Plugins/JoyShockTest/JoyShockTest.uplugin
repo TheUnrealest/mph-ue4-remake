@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "0.3 (in editor)",
+	"FriendlyName": "Joy Shock Plugin",
+	"Description": "not a test, but a plugin. heheheha",
+	"Category": "Other",
+	"CreatedBy": "Ninni",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": true,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "JoyShockTest",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
