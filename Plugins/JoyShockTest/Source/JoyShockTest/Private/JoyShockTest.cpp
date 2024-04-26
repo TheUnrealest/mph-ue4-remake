@@ -1,4 +1,4 @@
-// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
+﻿// Copyright 1998-2019 Epic Games, Inc. All Rights Reserved.
 
 #include "JoyShockTest.h"
 #include "Core.h"
@@ -28,7 +28,7 @@ void FJoyShockTestModule::StartupModule()
 	if (ExampleLibraryHandle)
 	{
 #if JOYSHOCK_DEBUG
-		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("HI", "heheheha")); // Mostra solo se debug attivo. Heheheha!
+		FMessageDialog::Open(EAppMsgType::Ok, LOCTEXT("HI", "heheheha👑")); // Mostra solo se debug attivo. Heheheha!
 #endif
 		
 #if JOYSHOCK_STARTUPCONNECT // Vogliamo anche connettere i Joy-Con all'avvio dell'editor?
