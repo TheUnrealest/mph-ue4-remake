@@ -38,6 +38,10 @@
 		{
 			"Name": "JoyShockTest",
 			"Enabled": true
+		},
+		{
+			"Name": "BlueprintMaterialTextureNodes",
+			"Enabled": true
 		}
 	],
 	"TargetPlatforms": [
