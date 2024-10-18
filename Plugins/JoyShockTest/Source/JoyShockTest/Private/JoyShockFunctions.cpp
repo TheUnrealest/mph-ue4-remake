@@ -76,7 +76,7 @@ void UJoyShockFunctions::JSP_GetAllMotionValues(int deviceID, FVector & Accelera
 	Quaternion.Z = m.quatZ;
 	Quaternion.W = m.quatW;
 	Acceleration.Set(m.accelX, m.accelY, m.accelZ);
-	Gravity.Set(m.gravX, m.gravY, m.gravZ);
+	Gravity.Set(m.gravX, m.gravZ, m.gravY); // Asse Z e Y sono invertite in JSL.
 }
 
 void UJoyShockFunctions::JSP_GetAccumulGyro(int deviceID, FRotator &gyro)
