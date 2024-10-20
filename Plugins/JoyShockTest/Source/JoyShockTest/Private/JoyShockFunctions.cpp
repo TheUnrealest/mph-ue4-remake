@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+// Questo è il mio codice.
 
 
 #include "JoyShockFunctions.h"
@@ -51,9 +51,10 @@ void UJoyShockFunctions::JSP_GetAllMotionValues(int deviceID, FVector & Accelera
 	   dimensioni. Gli assi utilizzati e la valutazione dell'angolo in Eulero dipendono anche dallo spazio utilizzato (JslSetGyroSpace).
 	*/
 
-	IMU_STATE i = JslGetIMUState(deviceID);
-	Gyro = FRotator(i.gyroY, i.gyroZ, i.gyroX); // Nei FRotator di UE4 non viene seguito l'ordine XYZ, ma... YZX?! Questo è sicuramente dovuto al fatto che
-												// ad esempio, per comandare la rotazione pitch (Y) si utilizza un'asse parallela a quella delle X.
+	Imu = JslGetIMUState(deviceID);
+	Gyro = FRotator(Imu.gyroX, -Imu.gyroY, Imu.gyroZ); // Nei FRotator di UE4 non viene seguito l'ordine XYZ, ma... YZX?! Questo è sicuramente dovuto al fatto che
+													  // ad esempio, per comandare la rotazione pitch (Y) si utilizza un'asse parallela a quella delle X.
+													  // A questo dobbiamo anche applicare il fatto che X e Z nei giroscopi sono... invertite.
 	
 	/* JslGetMotionState: fornisce valori ELABORATI che potrebbero non provenire direttamente dalla IMU.
 	   
@@ -70,13 +71,13 @@ void UJoyShockFunctions::JSP_GetAllMotionValues(int deviceID, FVector & Accelera
 	   Il suo vettore è normalizzato nel range [-1,1].
 	*/
 
-	MOTION_STATE m = JslGetMotionState(deviceID);
-	Quaternion.X = m.quatX;
-	Quaternion.Y = m.quatY;
-	Quaternion.Z = m.quatZ;
-	Quaternion.W = m.quatW;
-	Acceleration.Set(m.accelX, m.accelY, m.accelZ);
-	Gravity.Set(m.gravX, m.gravZ, m.gravY); // Asse Z e Y sono invertite in JSL.
+	Motion = JslGetMotionState(deviceID);
+	Quaternion.X = Motion.quatX;
+	Quaternion.Y = Motion.quatZ;
+	Quaternion.Z = Motion.quatY;
+	Quaternion.W = Motion.quatW;
+	Acceleration.Set(Motion.accelX, Motion.accelZ, Motion.accelY); // Asse Z e Y sono invertite in JSL.
+	Gravity.Set(Motion.gravX, Motion.gravZ, Motion.gravY); // Asse Z e Y sono invertite in JSL.
 }
 
 void UJoyShockFunctions::JSP_GetAccumulGyro(int deviceID, FRotator &gyro)
@@ -99,6 +100,11 @@ void UJoyShockFunctions::JSP_GetRightThumbstick(int deviceID, FVector2D & Thumbs
 int UJoyShockFunctions::JSP_GetMaxDevices()
 {
 	return MaxDevices;
+}
+
+int UJoyShockFunctions::JSP_GetConnectedDevices()
+{
+	return NumberOfDevices;
 }
 
 /* Funzioni di calibrazione */

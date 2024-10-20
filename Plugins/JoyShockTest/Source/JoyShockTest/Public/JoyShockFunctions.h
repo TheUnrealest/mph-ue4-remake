@@ -27,14 +27,25 @@ SIMBOLO CONSTEXPR: non è possibile modificarlo a runtime. Permette la costruzion
 */ 
 static int constexpr MaxDevices = 2; 
 
-static FQuat q;
-
 /*
 Numero di dispositivi restituito alla connessione JslConnectDevices(). E' inutile definire una funzione che ottenga questo valore:
 effettivamente cambia solo alla chiamata di JslConnectDevices(), e si azzera con JslDisconnectAndDisposeAll(). Nel caso in cui serva il valore, è possibile
 estrapolarlo da JslConnectDevices() e trattenerlo con una variabile in Blueprint.
+Ma nel caso serva ad una classe che NON chiama JslConnectDevices(), per evitare l'overhead del casting è meglio allocare qualche byte di RAM in più con una funzione parametrica.
 */
 static int NumberOfDevices;
+
+/*
+IMU_STATE e MOTION_STATE sono due tipi aggregati di variabile che contengono i dati di giroscopio e accelerometro.
+IMU_STATE fornisce i dati "così come sono" da giroscopi ed accelerometri.
+*/
+static IMU_STATE Imu;
+
+/*
+IMU_STATE e MOTION_STATE sono due tipi aggregati di variabile che contengono i dati di giroscopio e accelerometro.
+MOTION_STATE fornisce i dati elaborati dalla sensor fusion di Jsl.
+*/
+static MOTION_STATE Motion;
 
 /*
 Questa enum crea un metodo più "bellino" per poter selezionare la funzione della calibrazione continua (Continuous Calibration).
@@ -113,6 +124,9 @@ class JOYSHOCKTEST_API UJoyShockFunctions : public UBlueprintFunctionLibrary
 
 	UFUNCTION(BlueprintPure, meta=(CompactNodeTitle="JSP: Max Devices"))
 		static int JSP_GetMaxDevices();
+
+	UFUNCTION(BlueprintPure, meta = (CompactNodeTitle = "JSP: Devices Connected"))
+		static int JSP_GetConnectedDevices();
 
 	/* Funzioni di calibrazione */
 	// Auto
