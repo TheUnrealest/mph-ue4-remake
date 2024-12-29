@@ -20,7 +20,7 @@ void FJoyShockTestModule::StartupModule()
 	// Add on the relative location of the third party dll and load it
 	FString LibraryPath;
 #if PLATFORM_WINDOWS
-	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/ThirdParty/JoyShockLibrary.dll"));
+	LibraryPath = FPaths::Combine(*BaseDir, TEXT("Binaries/JoyShockLibrary.dll"));
 #endif // PLATFORM_WINDOWS
 
 	ExampleLibraryHandle = !LibraryPath.IsEmpty() ? FPlatformProcess::GetDllHandle(*LibraryPath) : nullptr;

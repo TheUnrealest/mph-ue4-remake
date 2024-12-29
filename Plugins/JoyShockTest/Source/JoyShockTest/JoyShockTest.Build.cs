@@ -26,7 +26,6 @@ public class JoyShockTest : ModuleRules
 			new string[]
 			{
 				"Core",
-                "JoyShockTestLibrary",
 				"Projects"
 				// ... add other public dependencies that you statically link with here ...
 			}
@@ -51,5 +50,14 @@ public class JoyShockTest : ModuleRules
 			}
 			);
 
+		if (Target.Platform == UnrealTargetPlatform.Win64)
+			{
+				// Add the import library
+				PublicLibraryPaths.Add(ModuleDirectory);
+				PublicAdditionalLibraries.Add("JoyShockLibrary.lib");
+
+				// Delay-load the DLL, so we can load it from the right place first
+				PublicDelayLoadDLLs.Add("JoyShockLibrary.dll");
+			}
     }
 }
