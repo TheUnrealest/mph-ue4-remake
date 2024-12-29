@@ -1,5 +1,6 @@
-#include "JoyShockPlugin.h"
 #include "JoyShockPluginDevice.h"
+#include "JoyShockPlugin.h"
+#include "JoyShockLibrary.h"
 #include "Runtime/InputCore/Classes/InputCoreTypes.h"
 #include "core.h"
 

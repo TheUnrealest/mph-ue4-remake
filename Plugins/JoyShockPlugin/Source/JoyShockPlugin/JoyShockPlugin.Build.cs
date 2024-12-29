@@ -6,9 +6,12 @@ public class JoyShockPlugin : ModuleRules
 {
 	public JoyShockPlugin(ReadOnlyTargetRules Target) : base(Target)
 	{
+
+        PCHUsage = ModuleRules.PCHUsageMode.UseExplicitOrSharedPCHs;
+
         PublicIncludePaths.AddRange(
 			new string[] {
-				"JoyShockPlugin/Public"
+                "Runtime/Engine/Classes/Kismet"
 				// ... add public include paths required here ...
 			}
 			);
@@ -16,7 +19,6 @@ public class JoyShockPlugin : ModuleRules
 		
 		PrivateIncludePaths.AddRange(
 			new string[] {
-				"JoyShockPlugin/Private",
 				// ... add other private include paths required here ...
 			}
 			);
@@ -30,6 +32,7 @@ public class JoyShockPlugin : ModuleRules
                 "Engine",
 				"InputCore",
 				"InputDevice",
+                "Projects"
 				// ... add other public dependencies that you statically link with here ...
 			}
 			);
@@ -38,7 +41,8 @@ public class JoyShockPlugin : ModuleRules
 		PrivateDependencyModuleNames.AddRange(
 			new string[]
 			{
-				"CoreUObject",
+                "Core",
+                "CoreUObject",
 				"Engine",
 				"Slate",
 				"SlateCore",
@@ -53,5 +57,15 @@ public class JoyShockPlugin : ModuleRules
 				// ... add any modules that your module loads dynamically here ...
 			}
 			);
-	}
+
+        if (Target.Platform == UnrealTargetPlatform.Win64)
+        {
+            // Add the import library
+            PublicLibraryPaths.Add(ModuleDirectory);
+            PublicAdditionalLibraries.Add("JoyShockLibrary.lib");
+
+            // Delay-load the DLL, so we can load it from the right place first
+            PublicDelayLoadDLLs.Add("JoyShockLibrary.dll");
+        }
+    }
 }

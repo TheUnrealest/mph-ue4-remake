@@ -1,9 +1,9 @@
 {
 	"FileVersion": 3,
 	"Version": 1,
-	"VersionName": "1.0",
-	"FriendlyName": "JoyShockPlugin",
-	"Description": "stole ts from jibbsmart. he cool",
+	"VersionName": "0.1",
+	"FriendlyName": "JoyShock Plugin",
+	"Description": "based on jibbsmart's joyshock library, and on haisongliang's custom input plugin. both of them are cool, like, cooler than me (i hate ue4 c++, memory leaks are eating my brain)",
 	"Category": "Input",
 	"CreatedBy": "TheUnrealest",
 	"CreatedByURL": "",
@@ -11,7 +11,7 @@
 	"MarketplaceURL": "",
 	"SupportURL": "",
 	"CanContainContent": true,
-	"IsBetaVersion": false,
+	"IsBetaVersion": true,
 	"Installed": false,
 	"Modules": [
 		{

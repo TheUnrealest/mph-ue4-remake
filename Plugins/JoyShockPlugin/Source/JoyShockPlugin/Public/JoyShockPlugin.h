@@ -5,6 +5,8 @@
 #include "ModuleManager.h"
 #include "IInputDeviceModule.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(JoyShockPlugin, Display, All);
+
 class FJoyShockPluginModule : public IInputDeviceModule
 {
 public:
@@ -37,4 +39,7 @@ public:
 	virtual void ShutdownModule() override;
 
 	TSharedPtr< class FJoyShockPluginDevice > JoyShockPluginDevice;
+
+private:
+	void* ExampleLibraryHandle;
 };
