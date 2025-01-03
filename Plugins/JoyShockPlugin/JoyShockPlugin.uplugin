@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "2.0",
+	"FriendlyName": "JoyShock Plugin",
+	"Description": "based on jibbsmart's joyshock library, and on haisongliang's custom input plugin, the joy shock plugin is now back, enhanced with the U N R E A L  I N P U T  S U B S Y S T E M",
+	"Category": "Heheheha, Input",
+	"CreatedBy": "TheUnrealest",
+	"CreatedByURL": "github.com/theunrealest",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": true,
+	"IsBetaVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "JoyShockPlugin",
+			"Type": "Runtime",
+			"LoadingPhase": "PostConfigInit"
+		}
+	]
+}
