@@ -34,8 +34,11 @@ const FKey JoyCon_L_SideR("JoyCon_L_SideR");
 
 // Movimento. Per effettuare l'output di vettori al sistema di input, sarebbe necessario Axis3D di Enhanced Input Subsystem (UE5). Ma qui ci arrangiamo...
 const FKey JoyCon_L_GyroX("JoyCon_L_GyroX");
+const FKey JoyCon_L_AccumulGyroX("JoyCon_L_AccumulGyroX");
 const FKey JoyCon_L_GyroY("JoyCon_L_GyroY");
+const FKey JoyCon_L_AccumulGyroY("JoyCon_L_AccumulGyroY");
 const FKey JoyCon_L_GyroZ("JoyCon_L_GyroZ");
+const FKey JoyCon_L_AccumulGyroZ("JoyCon_L_AccumulGyroZ");
 const FKey JoyCon_L_AccelX("JoyCon_L_AccelX");
 const FKey JoyCon_L_AccelY("JoyCon_L_AccelY");
 const FKey JoyCon_L_AccelZ("JoyCon_L_AccelZ");
@@ -67,8 +70,11 @@ const FKey JoyCon_R_SideR("JoyCon_R_SideR");
 
 // Movimento
 const FKey JoyCon_R_GyroX("JoyCon_R_GyroX");
+const FKey JoyCon_R_AccumulGyroX("JoyCon_R_AccumulGyroX");
 const FKey JoyCon_R_GyroY("JoyCon_R_GyroY");
+const FKey JoyCon_R_AccumulGyroY("JoyCon_R_AccumulGyroY");
 const FKey JoyCon_R_GyroZ("JoyCon_R_GyroZ");
+const FKey JoyCon_R_AccumulGyroZ("JoyCon_R_AccumulGyroZ");
 const FKey JoyCon_R_AccelX("JoyCon_R_AccelX");
 const FKey JoyCon_R_AccelY("JoyCon_R_AccelY");
 const FKey JoyCon_R_AccelZ("JoyCon_R_AccelZ");
@@ -87,6 +93,7 @@ int NumberOfDevices;
 
 // --------------------- Variabili input. Riducono overhead
 IMU_STATE ImuFull, ImuLeft, ImuRight;
+FVector AccumulGyroL, AccumulGyroR, AccumulGyroFull;
 MOTION_STATE MotionFull, MotionLeft, MotionRight;
 JOY_SHOCK_STATE StateFull, StateLeft, StateRight;
 FVector TiltFull, TiltLeft, TiltRight;
@@ -154,8 +161,11 @@ FJoyShockPluginDevice::FJoyShockPluginDevice(const TSharedRef<FGenericApplicatio
 	EKeys::AddKey(FKeyDetails(JoyCon_L_SideR, FText::FromString("JSP Joy-Con (L) SR Button"), FKeyDetails::GamepadKey));
 	// Movimento
 	EKeys::AddKey(FKeyDetails(JoyCon_L_GyroX, FText::FromString("JSP Joy-Con (L) Gyro X"), FKeyDetails::FloatAxis));
+	EKeys::AddKey(FKeyDetails(JoyCon_L_AccumulGyroX, FText::FromString("JSP Joy-Con (L) Accumulated Gyro X"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_L_GyroY, FText::FromString("JSP Joy-Con (L) Gyro Y"), FKeyDetails::FloatAxis));
+	EKeys::AddKey(FKeyDetails(JoyCon_L_AccumulGyroY, FText::FromString("JSP Joy-Con (L) Accumulated Gyro Y"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_L_GyroZ, FText::FromString("JSP Joy-Con (L) Gyro Z"), FKeyDetails::FloatAxis));
+	EKeys::AddKey(FKeyDetails(JoyCon_L_AccumulGyroZ, FText::FromString("JSP Joy-Con (L) Accumulated Gyro Z"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_L_AccelX, FText::FromString("JSP Joy-Con (L) Accelerometer X"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_L_AccelY, FText::FromString("JSP Joy-Con (L) Accelerometer Y"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_L_AccelZ, FText::FromString("JSP Joy-Con (L) Accelerometer Z"), FKeyDetails::FloatAxis));
@@ -181,8 +191,11 @@ FJoyShockPluginDevice::FJoyShockPluginDevice(const TSharedRef<FGenericApplicatio
 	EKeys::AddKey(FKeyDetails(JoyCon_R_SideR, FText::FromString("JSP Joy-Con (R) SR Button"), FKeyDetails::GamepadKey));
 	// Movimento
 	EKeys::AddKey(FKeyDetails(JoyCon_R_GyroX, FText::FromString("JSP Joy-Con (R) Gyro X"), FKeyDetails::FloatAxis));
+	EKeys::AddKey(FKeyDetails(JoyCon_R_AccumulGyroX, FText::FromString("JSP Joy-Con (R) Accumulated Gyro X"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_R_GyroY, FText::FromString("JSP Joy-Con (R) Gyro Y"), FKeyDetails::FloatAxis));
+	EKeys::AddKey(FKeyDetails(JoyCon_R_AccumulGyroY, FText::FromString("JSP Joy-Con (R) Accumulated Gyro Y"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_R_GyroZ, FText::FromString("JSP Joy-Con (R) Gyro Z"), FKeyDetails::FloatAxis));
+	EKeys::AddKey(FKeyDetails(JoyCon_R_AccumulGyroZ, FText::FromString("JSP Joy-Con (R) Accumulated Gyro Z"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_R_AccelX, FText::FromString("JSP Joy-Con (R) Accelerometer X"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_R_AccelY, FText::FromString("JSP Joy-Con (R) Accelerometer Y"), FKeyDetails::FloatAxis));
 	EKeys::AddKey(FKeyDetails(JoyCon_R_AccelZ, FText::FromString("JSP Joy-Con (R) Accelerometer Z"), FKeyDetails::FloatAxis));
@@ -232,6 +245,7 @@ void FJoyShockPluginDevice::SendControllerEvents()
 			ImuLeft = JslGetIMUState(T.Key);
 			MotionLeft = JslGetMotionState(T.Key);
 			StateLeft = JslGetSimpleState(T.Key);
+			JslGetAndFlushAccumulatedGyro(T.Key, AccumulGyroL.X, AccumulGyroL.Y, AccumulGyroL.Z);
 			// 2. Assi (levette)
 			MessageHandler->OnControllerAnalog(JoyCon_L_ThumbstickXAxis.GetFName(), 0, FMath::Pow(StateLeft.stickLX,3));
 			MessageHandler->OnControllerAnalog(JoyCon_L_ThumbstickYAxis.GetFName(), 0, FMath::Pow(StateLeft.stickLY,3));
@@ -269,6 +283,9 @@ void FJoyShockPluginDevice::SendControllerEvents()
 			MessageHandler->OnControllerAnalog(JoyCon_L_GyroX.GetFName(), 0, ImuLeft.gyroZ);
 			MessageHandler->OnControllerAnalog(JoyCon_L_GyroY.GetFName(), 0, ImuLeft.gyroX);
 			MessageHandler->OnControllerAnalog(JoyCon_L_GyroZ.GetFName(), 0, -ImuLeft.gyroY);
+			MessageHandler->OnControllerAnalog(JoyCon_L_AccumulGyroX.GetFName(), 0, AccumulGyroL.Z);
+			MessageHandler->OnControllerAnalog(JoyCon_L_AccumulGyroY.GetFName(), 0, AccumulGyroL.X);
+			MessageHandler->OnControllerAnalog(JoyCon_L_AccumulGyroZ.GetFName(), 0, -(AccumulGyroL.Y));
 			MessageHandler->OnControllerAnalog(JoyCon_L_AccelX.GetFName(), 0, MotionLeft.accelX);
 			MessageHandler->OnControllerAnalog(JoyCon_L_AccelY.GetFName(), 0, MotionLeft.accelZ);
 			MessageHandler->OnControllerAnalog(JoyCon_L_AccelZ.GetFName(), 0, MotionLeft.accelY);
@@ -282,6 +299,7 @@ void FJoyShockPluginDevice::SendControllerEvents()
 			ImuRight = JslGetIMUState(T.Key);
 			MotionRight = JslGetMotionState(T.Key);
 			StateRight = JslGetSimpleState(T.Key);
+			JslGetAndFlushAccumulatedGyro(T.Key, AccumulGyroR.X, AccumulGyroR.Y, AccumulGyroR.Z);
 			// 2. Assi (levette)
 			MessageHandler->OnControllerAnalog(JoyCon_R_ThumbstickXAxis.GetFName(), 0, FMath::Pow(StateRight.stickRX,3));
 			MessageHandler->OnControllerAnalog(JoyCon_R_ThumbstickYAxis.GetFName(), 0, FMath::Pow(StateRight.stickRY,3));
@@ -303,6 +321,9 @@ void FJoyShockPluginDevice::SendControllerEvents()
 			MessageHandler->OnControllerAnalog(JoyCon_R_GyroX.GetFName(), 0, ImuRight.gyroZ);
 			MessageHandler->OnControllerAnalog(JoyCon_R_GyroY.GetFName(), 0, ImuRight.gyroZ);
 			MessageHandler->OnControllerAnalog(JoyCon_R_GyroZ.GetFName(), 0, -ImuRight.gyroY);
+			MessageHandler->OnControllerAnalog(JoyCon_R_AccumulGyroX.GetFName(), 0, AccumulGyroR.Z);
+			MessageHandler->OnControllerAnalog(JoyCon_R_AccumulGyroY.GetFName(), 0, AccumulGyroR.X);
+			MessageHandler->OnControllerAnalog(JoyCon_R_AccumulGyroZ.GetFName(), 0, -(AccumulGyroR.Y));
 			MessageHandler->OnControllerAnalog(JoyCon_R_AccelX.GetFName(), 0, MotionRight.accelX);
 			MessageHandler->OnControllerAnalog(JoyCon_R_AccelY.GetFName(), 0, MotionRight.accelZ);
 			MessageHandler->OnControllerAnalog(JoyCon_R_AccelZ.GetFName(), 0, MotionRight.accelY);

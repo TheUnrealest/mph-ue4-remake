@@ -52,6 +52,11 @@ int UJoyShockFunctions::JSP_GetConnectedDevices(TMap<int, TEnumAsByte<E_JSP_Cont
 	return NumberOfDevices; // Numero di dispositivi connessi in questo momento.
 }
 
+float UJoyShockFunctions::JSP_GetDeltaTime(int deviceID)
+{
+	return JslGetTimeSinceLastUpdate(deviceID);
+}
+
 /* Funzioni di calibrazione */
 
 void UJoyShockFunctions::JSP_SetAutoCalibrationEnabled(int deviceID, bool enabled)

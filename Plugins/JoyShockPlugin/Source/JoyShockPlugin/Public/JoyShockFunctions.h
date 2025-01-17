@@ -106,6 +106,10 @@ public:
 			static int JSP_GetConnectedDevices(
 				TMap<int, TEnumAsByte<E_JSP_ControllerType>> & Map);
 
+		UFUNCTION(BlueprintPure, meta = (CompactNodeTitle = "JSP: Delta Time"))
+			static float JSP_GetDeltaTime(
+			int deviceID);
+
 		/* Funzioni di calibrazione */
 		// Auto
 		UFUNCTION(BlueprintCallable, meta = (DisplayName = "Set Auto Calibration Enabled", ToolTip = "Attiva/disattiva auto calibrazione per il Joy-Con con il deviceID fornito."))
