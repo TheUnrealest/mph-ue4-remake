@@ -35,7 +35,7 @@ enum E_JSP_ContCalibrationFunction
 {
 	// Raccogli i dati e usali immediatamente per la calibrazione.
 	Start,
-	// Smetti di raccogliere dati, ma non cancellarli. Continua ad usarli per la calibrazione.
+	// Smetti di raccogliere dati, ma non cancellarli. Continua a usarli per la calibrazione.
 	Stop,
 	// Resetta la calibrazione e cancella i dati. Da usare in congiunzione, prima di Start, volendo.
 	Reset
@@ -82,9 +82,9 @@ public:
 
 	/*
 	Numero di dispositivi restituito alla connessione JslConnectDevices(). E' inutile definire una funzione che ottenga questo valore:
-	effettivamente cambia solo alla chiamata di JslConnectDevices(), e si azzera con JslDisconnectAndDisposeAll(). Nel caso in cui serva il valore, e' possibile
+	effettivamente cambia solo alla chiamata di JslConnectDevices(), e si azzera con JslDisconnectAndDisposeAll(). Nel caso in cui serva il valore, è possibile
 	estrapolarlo da JslConnectDevices() e trattenerlo con una variabile in Blueprint.
-	Ma nel caso serva ad una classe che NON chiama JslConnectDevices(), per evitare l'overhead del casting e' meglio allocare qualche byte di RAM in piu' con una funzione parametrica.
+	Ma nel caso serva a una classe che NON chiama JslConnectDevices(), per evitare l'overhead del casting è meglio allocare qualche byte di RAM in piu' con una funzione parametrica.
 	*/
 	static int NumberOfDevices;
 

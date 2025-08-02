@@ -24,6 +24,9 @@
 
 // these guys contain all the boring stuff, but they are essential to actually "make" the components real.
 #include "BlueprintEditorUtils.h"
+#include "DrawDebugHelpers.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
@@ -51,8 +54,14 @@ ASamus::ASamus()
 	GameplayGun = CreateDefaultSubobject<USkeletalMeshComponent>("GameplayGun");
 	GameplayGun->SetupAttachment(FirstPersonCamera);
 
+
 	// Le real (100% no cap) cannon.
 	CutsceneGun = CreateDefaultSubobject<USkeletalMeshComponent>("CutsceneGun");
+
+	// Impostor (amogus) gun is visible only for us. Real stuff (cutscene) is hidden to us, but visible to the world.
+	GameplayGun->SetOnlyOwnerSee(true);
+	CutsceneGun->SetOwnerNoSee(true);
+	GetMesh()->SetOwnerNoSee(true);
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -88,7 +97,15 @@ void ASamus::BeginPlay()
 void ASamus::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
+	UpdateMovementVariables();
+	
+	switch (AimModes)
+	{
+	case EAimModes::Fixed: 	AdjustAiming_Fixed();
+	case EAimModes::Movable: ;
+	case EAimModes::Gyro: ;
+	}
 }
 
 // Called to bind functionality to input
@@ -107,6 +124,8 @@ void ASamus::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction("Jump",IE_Released,this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("Fire",IE_Pressed, this, &ASamus::Kaboom);
 	PlayerInputComponent->BindAction("LockOn",IE_Pressed, this, &ASamus::LockOn);
+	PlayerInputComponent->BindAction("NextWeapon",IE_Pressed,this,&ASamus::NextWeapon);
+	PlayerInputComponent->BindAction("PrevWeapon",IE_Pressed,this,&ASamus::PrevWeapon);
 
 	// Aiming
 	PlayerInputComponent->BindAxis("Turn",this, &ASamus::Turn);
@@ -134,14 +153,29 @@ void ASamus::MoveRight(float AxisValue)
 
 void ASamus::Turn(float AxisValue)
 {
+	switch(AimModes)
+	{
+	case EAimModes::Fixed: 
+		AddControllerYawInput(AxisValue*MouseSensX_Fixed);
+	case EAimModes::Movable:
+		CrosshairScreenLocation.X += AxisValue*MouseSensX_Movable;
+	case EAimModes::Gyro: break;
+	}
+
 	// mouse input is calculated as a distance and not as a velocity. looks like we don't need delta seconds here...
-	AddControllerYawInput(AxisValue*MouseSensX_Fixed);
 }
 
 void ASamus::LookUp(float AxisValue)
 {
 	// mouse input is calculated as a distance and not as a velocity. looks like we don't need delta seconds here...
-	AddControllerPitchInput(AxisValue*MouseSensY_Fixed);
+	switch (AimModes)
+	{
+	case EAimModes::Fixed:
+		AddControllerPitchInput(AxisValue*MouseSensY_Fixed); break;
+	case EAimModes::Movable:
+		CrosshairScreenLocation.Y += AxisValue*MouseSensY_Movable; break;
+	case EAimModes::Gyro: break;
+	}
 }
 
 void ASamus::TurnRate(float AxisValue)
@@ -159,10 +193,25 @@ void ASamus::LookUpRate(float AxisValue)
 // OPEN FIREEEEEE!!!
 void ASamus::Kaboom()
 {
+	// 1. Are we able to fire? @todo do this.
+
+	// 2. Let the mess begin.
+	// First of all, we need to create Spawn Parameters. Essential to pass info to the created projectile.
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this; // Player is owner...
+
+	// We can now spawn a projectile and get a reference to it.
+	LastProjectileSpawned = GetWorld()->SpawnActor<AProjectile>(
+		ProjectileClassToSpawn,						// Spawn the selected class,
+		GameplayGun->GetSocketLocation("Gun"),		// at the gun muzzle location,
+		GameplayGun->GetSocketRotation("Gun"),		// with the gun world rotation.
+		SpawnParams);
+	
 }
 
 void ASamus::LockOn()
 {
+	
 }
 
 void ASamus::Sprint(float AxisValue)
@@ -185,6 +234,24 @@ void ASamus::Sprint(float AxisValue)
 	// Using the computed SpeedAlpha, we can calculate the character velocity and set it to MaxWalkSpeed.
 	// A Lerp is the perfect combination between smoothness and ease of gameplay.
 	GetCharacterMovement()->MaxWalkSpeed = FMath::Lerp(WalkingSpeed,SprintingSpeed, SpeedAlpha);
+}
+
+void ASamus::NextWeapon()
+{
+	// Mr. Maciocco told me a modulo (%) is amazing to create loops of values. Well, here goes nothing!
+	BeamTypeIndex++;
+	BeamTypeIndex %= NumberOfBeams; // BRO I SWEAR THE AUTOCOMPLETE FUNCTION IS AMAZING
+	BeamType = static_cast<EBeamTypes>(BeamTypeIndex); // I am no cpp wizard... don't even know if this is good practice
+	UpdateWeapon(); // execute additional game state updates when changing a weapon.
+}
+
+void ASamus::PrevWeapon()
+{
+	// Same as NextWeapon(), but we subtract 1 from BeamTypeIndex.
+	BeamTypeIndex--;
+	BeamTypeIndex %= NumberOfBeams;
+	BeamType = static_cast<EBeamTypes>(BeamTypeIndex); // and the autocomplete function strikes again.
+	UpdateWeapon(); // execute additional game state updates when changing a weapon.
 }
 
 ////////////////////////////////////////////// GAMEPLAY STATE FUNCTIONS ////////////////////////////////////////////////
@@ -210,5 +277,109 @@ void ASamus::UpdateMovementVariables()
 	// Ue4 functions have odd naming. And here's the demonstration.
 	bIsInAir = !GetCharacterMovement()->IsMovingOnGround(); // IsMovingOnGround() means "is touching the ground".
 	
+}
+
+void ASamus::UpdateWeapon()
+{
+	ProjectileClassToSpawn = GetProjectileClassToSpawn(); // update which projectile we will spawn.
+}
+
+
+//////////////////////////////////////////////////// AIM ADJUSTMENTS ///////////////////////////////////////////////////
+
+void ASamus::AdjustAiming_Fixed()
+{
+	/** Adjusting aiming means to "let the projectile impact behind the crosshair". How do we do this?
+	 *	Very simple: we rotate the Arm Cannon.
+	 *
+	 *	Let's say we have a line of sight, which starts from camera center and lands to the point behind the crosshair.
+	 *	Now, we want the projectile to hit that point behind the crosshair. Of course, without adjustments, it WON'T
+	 *	hit because the cannon position is different from the camera position.
+	 *	
+	 *	What we want to do is to calculate the rotation needed for the cannon to point at the desired aiming point. And
+	 *	to do that, we just need to:
+	 *	1) get information on the point behind the crosshair (location, distance from us, normals and stuff)
+	 *	2) LookAtRotation() will align the cannon to "point" at a certain "point" (pun intended).
+	 *
+	 *	For this edge case, the crosshair location is at the center of the camera (ViewportSize/2) at all times.
+	 */
+
+	FVector TraceStart = FirstPersonCamera->GetComponentLocation(); // starting point of the trace
+	FVector TraceEnd = TraceStart + FirstPersonCamera->GetForwardVector()*MaximumAimDistance; // end position of the trace
+	FHitResult Hit;
 	
+	if (LineTraceByChannel(TraceStart,TraceEnd, Hit))
+	{
+		// We got a hit, which means there's something we can aim to, on our line of sight.
+		AimDistance = Hit.Distance;
+		AimingPoint = Hit.Location;
+		AimingNormal = Hit.ImpactNormal;
+		AimingTargetActor = Hit.GetActor();
+
+		// Now, we try to get the rotation needed by the cannon to aim at the desired point.
+		FVector CannonLocation = GameplayGun->GetComponentLocation();
+		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(CannonLocation,Hit.Location);
+		NewRotation.Roll = 0.f;
+		
+		GameplayGun->SetWorldRotation(NewRotation); // and we set it to the cannon. that FindLook is in world space.
+		// Geez, it looks really complicated here (but it's not). It's quite intuitive in Blueprints.
+	}
+	else
+	{
+		// The aiming point will be at the end of the trace, with max distance, and up normal. No actor.
+		AimDistance = MaximumAimDistance;
+		AimingPoint = TraceEnd;
+		AimingNormal = FVector::UpVector;
+		AimingTargetActor = nullptr; // nullptr ts too.
+		
+		// we only know the rotation relative to camera must be 0, we don't know what are we actually watching in WS.
+		GameplayGun->SetRelativeRotation(FRotator(0, 0, 0));
+	}
+}
+
+void ASamus::AdjustAiming_Movable()
+{
+	/** This is a generalization of AdjustAiming_Fixed(), where our aiming point is not calculated from camera position
+	 *  (because the crosshair is not at the center anymore). We'll use screen deprojection to get the 3d point behind
+	 *  the crosshair at a certain X;Y screen position.
+	 */
+	
+}
+
+void ASamus::AdjustAiming_Gyro()
+{
+	
+}
+
+////////////////////////////////////////////////////// UTILITIES ///////////////////////////////////////////////////////
+
+FORCEINLINE TSubclassOf<AProjectile> ASamus::GetProjectileClassToSpawn() const
+{
+	switch (BeamType)
+	{
+	case 0: return EnergyBeamClass;
+	case 1: return BattlehammerClass;
+	case 2: return JudicatorClass;
+	case 3: return VoltDriverClass;
+	case 4: return ImperialistClass;
+	case 5: return MagmaulClass;
+	case 6: return ShockCoilClass;
+	case 7: return OmegaBeamClass;
+	case 255: return EnergyBeamClass;
+	default: return EnergyBeamClass;
+	}
+}
+
+FORCEINLINE bool ASamus::LineTraceByChannel(FVector Start, FVector End, FHitResult& Hit)
+{
+	return UKismetSystemLibrary::LineTraceSingle(
+		GetWorld(),
+		Start,
+		End,
+		UEngineTypes::ConvertToTraceType(ECC_Visibility),
+		false,
+		TArray<AActor*>(),
+		Debug_bShowAimAdjustTrace ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None,
+		Hit,
+		true);
 }
