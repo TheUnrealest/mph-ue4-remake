@@ -32,8 +32,12 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerController.h"
 
 //////////////////////////////////////// THE MIGHTY CONSTRUCTOR METHOD(s?) /////////////////////////////////////////////
+
+APlayerController* PlayerController; // a helper variable for the player controller.
+									 // cause GetWorld()->GetFirstPlayerController(); is too long.
 
 // "let there be UActorComponents and UPROPERTY-ies, and make them attach." - the memory allocator
 ASamus::ASamus()
@@ -90,7 +94,7 @@ void ASamus::OnConstruction(const FTransform& Transform)
 void ASamus::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	PlayerController = Cast<APlayerController>(this->Controller);
 }
 
 // Called every frame
@@ -103,7 +107,7 @@ void ASamus::Tick(float DeltaTime)
 	switch (AimModes)
 	{
 	case EAimModes::Fixed: 	AdjustAiming_Fixed();
-	case EAimModes::Movable: ;
+	case EAimModes::Movable: AdjustAiming_Movable();
 	case EAimModes::Gyro: ;
 	}
 }
@@ -343,7 +347,31 @@ void ASamus::AdjustAiming_Movable()
 	 *  (because the crosshair is not at the center anymore). We'll use screen deprojection to get the 3d point behind
 	 *  the crosshair at a certain X;Y screen position.
 	 */
-	
+	FVector TraceStart = FirstPersonCamera->GetComponentLocation();
+	FVector TraceEnd;
+	PlayerController->DeprojectScreenPositionToWorld(CrosshairScreenLocation.X,CrosshairScreenLocation.Y, TraceEnd,AimingNormal);
+
+	FHitResult Hit;
+	if (LineTraceByChannel(TraceStart,TraceEnd, Hit))
+	{
+		// We got a hit, which means there's something we can aim to, on our line of sight.
+		AimDistance = Hit.Distance;
+		AimingPoint = Hit.Location;
+		AimingNormal = Hit.ImpactNormal;
+		AimingTargetActor = Hit.GetActor();
+
+		// Now, we try to get the rotation needed by the cannon to aim at the desired point.
+		FVector CannonLocation = GameplayGun->GetComponentLocation();
+		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(CannonLocation,Hit.Location);
+		NewRotation.Roll = 0.f;
+		
+		GameplayGun->SetWorldRotation(NewRotation); // and we set it to the cannon. that FindLook is in world space.
+		// Geez, it looks really complicated here (but it's not). It's quite intuitive in Blueprints.
+	}
+	else
+	{
+		
+	}
 }
 
 void ASamus::AdjustAiming_Gyro()
