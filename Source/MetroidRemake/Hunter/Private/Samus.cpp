@@ -31,13 +31,14 @@
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/Engine.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerController.h"
 
 //////////////////////////////////////// THE MIGHTY CONSTRUCTOR METHOD(s?) /////////////////////////////////////////////
 
 APlayerController* PlayerController; // a helper variable for the player controller.
-									 // cause GetWorld()->GetFirstPlayerController(); is too long.
+									 // cause Cast<APlayerController>(this->Controller); is too long.
 
 // "let there be UActorComponents and UPROPERTY-ies, and make them attach." - the memory allocator
 ASamus::ASamus()
@@ -57,15 +58,17 @@ ASamus::ASamus()
 	// Le fake cannon.
 	GameplayGun = CreateDefaultSubobject<USkeletalMeshComponent>("GameplayGun");
 	GameplayGun->SetupAttachment(FirstPersonCamera);
-
-
+	
 	// Le real (100% no cap) cannon.
 	CutsceneGun = CreateDefaultSubobject<USkeletalMeshComponent>("CutsceneGun");
 
 	// Impostor (amogus) gun is visible only for us. Real stuff (cutscene) is hidden to us, but visible to the world.
 	GameplayGun->SetOnlyOwnerSee(true);
+	GameplayGun->CastShadow = false;
 	CutsceneGun->SetOwnerNoSee(true);
+	CutsceneGun->bCastHiddenShadow = true;
 	GetMesh()->SetOwnerNoSee(true);
+	GetMesh()->bCastHiddenShadow = true;
 	
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -85,7 +88,6 @@ void ASamus::OnConstruction(const FTransform& Transform)
 		GetMesh(),
 		FAttachmentTransformRules::SnapToTargetNotIncludingScale,
 		TEXT("GunSocket")); // Ts (this) attaches CutsceneGun to Samus' Suit.
-	
 }
 
 //////////////////////////////////////////// ENGINE STANDARD FUNCTIONS /////////////////////////////////////////////////
@@ -95,6 +97,7 @@ void ASamus::BeginPlay()
 {
 	Super::BeginPlay();
 	PlayerController = Cast<APlayerController>(this->Controller);
+	CrosshairScreenLocation = FIntPoint::DivideAndRoundUp(GEngine->GameViewport->Viewport->GetSizeXY(),2);
 }
 
 // Called every frame
@@ -108,7 +111,7 @@ void ASamus::Tick(float DeltaTime)
 	{
 	case EAimModes::Fixed: 	AdjustAiming_Fixed();
 	case EAimModes::Movable: AdjustAiming_Movable();
-	case EAimModes::Gyro: ;
+	case EAimModes::Gyro: AdjustAiming_Gyro();
 	}
 }
 
@@ -157,28 +160,72 @@ void ASamus::MoveRight(float AxisValue)
 
 void ASamus::Turn(float AxisValue)
 {
+	// we might need this. or might not, if in fixed mode.
+	FVector2D const Resolution = GEngine->GameViewport->Viewport->GetSizeXY();
+	
 	switch(AimModes)
 	{
-	case EAimModes::Fixed: 
-		AddControllerYawInput(AxisValue*MouseSensX_Fixed);
+	case EAimModes::Fixed:
+		{
+			// In fixed mode, it's as easy as literally adding the input.
+			AddControllerYawInput(AxisValue*MouseSensX_Fixed); break;
+		}
+		
+		
 	case EAimModes::Movable:
-		CrosshairScreenLocation.X += AxisValue*MouseSensX_Movable;
-	case EAimModes::Gyro: break;
-	}
+		{
+			// In movable mode, we need to do 3 things.
+			// 1) add the input to the CrosshairScreenLocation, X value.
+			CrosshairScreenLocation.X += AxisValue*MouseSensX_Movable;
+			CrosshairScreenLocation.X = UKismetMathLibrary::FClamp(CrosshairScreenLocation.X,0,Resolution.X);
 
-	// mouse input is calculated as a distance and not as a velocity. looks like we don't need delta seconds here...
+			// 2) calculate signed distance (simple subtraction) from center of the screen.
+
+			float DistanceX = CrosshairScreenLocation.X - (Resolution.X)*.5f;
+			// We need to divide this by total screen width, as sensitivity must be equal in both 144p and 8k.
+			float InputX = DistanceX/Resolution.X;
+
+			// 3) actually apply our input!
+			AddControllerYawInput(InputX*YawSpeed_Movable*GetWorld()->GetDeltaSeconds()); break;
+		}
+	case EAimModes::Gyro:
+		{
+			break;
+		}
+	}
 }
 
 void ASamus::LookUp(float AxisValue)
 {
-	// mouse input is calculated as a distance and not as a velocity. looks like we don't need delta seconds here...
+	FVector2D Resolution = GEngine->GameViewport->Viewport->GetSizeXY();
+	
 	switch (AimModes)
 	{
 	case EAimModes::Fixed:
-		AddControllerPitchInput(AxisValue*MouseSensY_Fixed); break;
+		{
+			AddControllerPitchInput(AxisValue*MouseSensY_Fixed); break;
+		}
+	
 	case EAimModes::Movable:
-		CrosshairScreenLocation.Y += AxisValue*MouseSensY_Movable; break;
-	case EAimModes::Gyro: break;
+		{
+			// In movable mode, we need to do 3 things.
+			// 1) add the input to the CrosshairScreenLocation, Y value.
+			CrosshairScreenLocation.Y += AxisValue*MouseSensY_Movable;
+			CrosshairScreenLocation.Y = UKismetMathLibrary::FClamp(CrosshairScreenLocation.Y,0,Resolution.Y);
+			
+			// 2) calculate signed distance (simple subtraction) from center of the screen.
+			float DistanceY = CrosshairScreenLocation.Y - (Resolution.Y)*.5f;
+			// We need to divide this by total screen width, as sensitivity must be equal in both 144p and 8k.
+			float InputY = DistanceY/Resolution.Y;
+
+			// 3) actually apply our input!
+			AddControllerPitchInput(InputY*PitchSpeed_Movable*GetWorld()->GetDeltaSeconds()); break;
+		}
+		
+	case EAimModes::Gyro:
+		{
+			break;
+		}
 	}
 }
 
@@ -343,35 +390,11 @@ void ASamus::AdjustAiming_Fixed()
 
 void ASamus::AdjustAiming_Movable()
 {
-	/** This is a generalization of AdjustAiming_Fixed(), where our aiming point is not calculated from camera position
-	 *  (because the crosshair is not at the center anymore). We'll use screen deprojection to get the 3d point behind
-	 *  the crosshair at a certain X;Y screen position.
+	/** At its core, AdjustAiming_Movable() is much more than a generalization of Fixed.
+	 *  First of all, it dynamically controls the camera orientation based on CrosshairScreenLocation.
+	 *  Only then, it actually "adjusts" aiming.
 	 */
-	FVector TraceStart = FirstPersonCamera->GetComponentLocation();
-	FVector TraceEnd;
-	PlayerController->DeprojectScreenPositionToWorld(CrosshairScreenLocation.X,CrosshairScreenLocation.Y, TraceEnd,AimingNormal);
-
-	FHitResult Hit;
-	if (LineTraceByChannel(TraceStart,TraceEnd, Hit))
-	{
-		// We got a hit, which means there's something we can aim to, on our line of sight.
-		AimDistance = Hit.Distance;
-		AimingPoint = Hit.Location;
-		AimingNormal = Hit.ImpactNormal;
-		AimingTargetActor = Hit.GetActor();
-
-		// Now, we try to get the rotation needed by the cannon to aim at the desired point.
-		FVector CannonLocation = GameplayGun->GetComponentLocation();
-		FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(CannonLocation,Hit.Location);
-		NewRotation.Roll = 0.f;
-		
-		GameplayGun->SetWorldRotation(NewRotation); // and we set it to the cannon. that FindLook is in world space.
-		// Geez, it looks really complicated here (but it's not). It's quite intuitive in Blueprints.
-	}
-	else
-	{
-		
-	}
+	
 }
 
 void ASamus::AdjustAiming_Gyro()
@@ -380,34 +403,3 @@ void ASamus::AdjustAiming_Gyro()
 }
 
 ////////////////////////////////////////////////////// UTILITIES ///////////////////////////////////////////////////////
-
-FORCEINLINE TSubclassOf<AProjectile> ASamus::GetProjectileClassToSpawn() const
-{
-	switch (BeamType)
-	{
-	case 0: return EnergyBeamClass;
-	case 1: return BattlehammerClass;
-	case 2: return JudicatorClass;
-	case 3: return VoltDriverClass;
-	case 4: return ImperialistClass;
-	case 5: return MagmaulClass;
-	case 6: return ShockCoilClass;
-	case 7: return OmegaBeamClass;
-	case 255: return EnergyBeamClass;
-	default: return EnergyBeamClass;
-	}
-}
-
-FORCEINLINE bool ASamus::LineTraceByChannel(FVector Start, FVector End, FHitResult& Hit)
-{
-	return UKismetSystemLibrary::LineTraceSingle(
-		GetWorld(),
-		Start,
-		End,
-		UEngineTypes::ConvertToTraceType(ECC_Visibility),
-		false,
-		TArray<AActor*>(),
-		Debug_bShowAimAdjustTrace ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None,
-		Hit,
-		true);
-}

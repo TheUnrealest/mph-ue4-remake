@@ -30,19 +30,12 @@
 
 // these are our projectile definition. ONLY INCLUDE THEM WHEN YOU NEED THEM DIRECTLY!
 #include "Projectiles/Projectile.h"
-#include "Projectiles/Battlehammer.h"
-#include "Projectiles/EnergyBeam.h"
-#include "Projectiles/Imperialist.h"
-#include "Projectiles/Judicator.h"
-#include "Projectiles/Magmaul.h"
-#include "Projectiles/OmegaBeam.h"
-#include "Projectiles/ShockCoil.h"
-#include "Projectiles/VoltDriver.h"
 
 // the game instance contains info about the whole game:
 // level, player and gameplay data (including projectiles, types and various structs)
 #include "CollisionQueryParams.h"
-#include "Game/GameInstance/MetroidGameInstance.h"
+#include "Kismet/KismetSystemLibrary.h"
+#include "Engine/World.h"
 
 // this guy is auto generated. must be the last inclusion, or bad things will happen 💀
 #include "Samus.generated.h"
@@ -217,11 +210,11 @@ public:
 	
 	/** mouse sensitivity on the x-axis, movable mode. unit is: @todo unit? */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aiming|Movable Mode")
-	float MouseSensX_Movable = 100.f;
+	float MouseSensX_Movable = 10.f;
 
 	/** mouse sensitivity on the y-axis, movable mode. unit is: @todo unit? */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aiming|Movable Mode")
-	float MouseSensY_Movable = 100.f;
+	float MouseSensY_Movable = 10.f;
 
 	/** controller sensitivity on the x-axis, movable mode. unit is: pixels/s.
 	 * @todo: convert it to relative screen location */
@@ -232,6 +225,14 @@ public:
 	 * @todo: convert it to relative screen location */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aiming|Movable Mode")
 	float ControllerSensY_Movable = 500.f;
+
+	/** maximum pitch rotation speed in movable mode (when the cursor is at y=0/y=max). unit is: pitch degrees/s. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aiming|Movable Mode")
+	float PitchSpeed_Movable = 180.f;
+
+	/** maximum yaw rotation speed in movable mode (when the cursor is at x=0/x=max). unit is: yaw degrees/s. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Aiming|Movable Mode")
+	float YawSpeed_Movable = 180.f;
 
 	/** exponent applied to raw input on the x-axis, movable mode. a high value will zero out low values.
 	 *  SIGN WILL BE PRESERVED FOR EVEN EXPONENTS -- DON'T WORRY! */
@@ -267,10 +268,6 @@ protected:
 	
 	// Runtime
 	#pragma region aiming_runtime
-	
-	/** location of the crosshair on the screen. only meaningful with movable or gyro mode. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Aiming|Runtime")
-	FVector2D CrosshairScreenLocation;
 
 	#pragma region aiming_runtime:aiming_point_info
 
@@ -295,6 +292,10 @@ protected:
 	AActor* AimingTargetActor;
 	#pragma endregion aiming_runtime:aiming_point_info
 
+	/** location of the crosshair on the screen. only meaningful with movable or gyro mode. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Aiming|Runtime")
+	FVector2D CrosshairScreenLocation;
+	
 	#pragma endregion aiming_runtime
 
 	//--------------------------------------------------- Firing -----------------------------------------------------//
@@ -437,15 +438,47 @@ protected:
 	void AdjustAiming_Gyro();
 
 	// ------------------------------------------------- Utilities -------------------------------------------------- //
-    	
-	/** This helper function selects which projectile class are we gonna spawn. */
-	FORCEINLINE TSubclassOf<AProjectile> GetProjectileClassToSpawn() const;
+	
+	/** This helper function selects which projectile class are we gonna spawn. FORCEINLINE so BLAZINGLY FAST. */
+	FORCEINLINE TSubclassOf<AProjectile> GetProjectileClassToSpawn() const
+	{
+		switch (BeamType)
+		{
+		case 0: return EnergyBeamClass;
+		case 1: return BattlehammerClass;
+		case 2: return JudicatorClass;
+		case 3: return VoltDriverClass;
+		case 4: return ImperialistClass;
+		case 5: return MagmaulClass;
+		case 6: return ShockCoilClass;
+		case 7: return OmegaBeamClass;
+		case 255: return EnergyBeamClass;
+		default: return EnergyBeamClass;
+		}
+	}
 
-	/** This function casts a raytrace and returns some stuff. */
-	FORCEINLINE bool LineTraceByChannel(
-	FVector Start,
-	FVector End,
-	FHitResult& Hit
-	);
+	/** This function casts a raytrace and returns some stuff. FORCEINLINEd, but idk if it actually works.*/
+	FORCEINLINE bool LineTraceByChannel(FVector Start, FVector End, FHitResult& Hit)
+	{
+		return UKismetSystemLibrary::LineTraceSingle(
+		GetWorld(),
+		Start,
+		End,
+		UEngineTypes::ConvertToTraceType(ECC_Visibility),
+		false,
+		TArray<AActor*>(),
+		Debug_bShowAimAdjustTrace ? EDrawDebugTrace::ForOneFrame : EDrawDebugTrace::None,
+		Hit,
+		true);
+	}
 
+	// -------------------------------------------------- Getters --------------------------------------------------- //
+public:
+	// @todo: target and lock on target getters?
+
+	/** Returns the current crosshair screen location. Useful for HUD and Widgets. FORCEINLINE WHOOOM!!! */
+	FORCEINLINE FVector2D GetCrosshairLocation()
+	{
+		return CrosshairScreenLocation;
+	}
 };

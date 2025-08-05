@@ -7,8 +7,18 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="37170a1f-450e-4470-a79e-0cd9e24e2e79" name="Changes" comment="">
+    <list default="true" id="d4a42356-29de-4803-b635-d9b9629169e7" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.MetroidRemake/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.MetroidRemake/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Config/DefaultEngine.ini" beforeDir="false" afterPath="$PROJECT_DIR$/Config/DefaultEngine.ini" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Samus/Blueprints/BP_Samus.uasset" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Samus/Blueprints/BP_Samus.uasset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Content/Showcase/TestLevel.umap" beforeDir="false" afterPath="$PROJECT_DIR$/Content/Showcase/TestLevel.umap" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MetroidRemake.uproject" beforeDir="false" afterPath="$PROJECT_DIR$/MetroidRemake.uproject" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Hud/SamusHud.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Hud/SamusHud.cpp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Private/Samus.cpp" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Private/Samus.cpp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Private/Samus.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Private/Samus.h" afterDir="false" />
+    </list>
+    <list id="db063472-76ff-49f8-a22d-5fb899ddddf4" name="Uno reverse card" comment="">
+      <change beforePath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Private/Samus.h" beforeDir="false" afterPath="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Private/Samus.h" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -21,37 +31,48 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Intermediate/Build/Win64/UE4Editor/Inc/MetroidRemake/ProjectileDataBase.gen.cpp" root0="SKIP_HIGHLIGHTING" />
+  <component name="LineStatusTrackerManager">
+    <file path="$PROJECT_DIR$/Source/MetroidRemake/Hunter/Private/Samus.h">
+      <ranges>
+        <range start1="32" end1="40" start2="32" end2="32" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+        <range start1="44" end1="45" start2="36" end2="38" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+        <range start1="219" end1="220" start2="212" end2="213" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+        <range start1="223" end1="224" start2="216" end2="217" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+        <range start1="234" end1="234" start2="227" end2="235" changelist="db063472-76ff-49f8-a22d-5fb899ddddf4" />
+        <range start1="269" end1="273" start2="270" end2="270" changelist="db063472-76ff-49f8-a22d-5fb899ddddf4" />
+        <range start1="297" end1="297" start2="294" end2="298" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+        <range start1="439" end1="442" start2="440" end2="458" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+        <range start1="443" end1="449" start2="459" end2="473" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+        <range start1="450" end1="450" start2="474" end2="483" changelist="d4a42356-29de-4803-b635-d9b9629169e7" />
+      </ranges>
+    </file>
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 3
 }</component>
-  <component name="ProjectId" id="30VlcjYoJoVEnb8BohrdBAPuwFR" />
+  <component name="ProjectId" id="30sOBHeZ8uGDK3xLRx2txBcWEAi" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "C/C++ Project.MetroidRemake.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "cpp-revamp",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "UnrealLinkOptionsId",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;C/C++ Project.MetroidRemake.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;cpp-revamp&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration name="MetroidRemake" type="CppProject" factoryName="C++ Project">
       <configuration_1 setup="1">
@@ -76,22 +97,33 @@
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="37170a1f-450e-4470-a79e-0cd9e24e2e79" name="Changes" comment="" />
-      <created>1753720703625</created>
+      <changelist id="d4a42356-29de-4803-b635-d9b9629169e7" name="Changes" comment="" />
+      <changelist id="db063472-76ff-49f8-a22d-5fb899ddddf4" name="Uno reverse card" comment="" />
+      <created>1754412678365</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1753720703625</updated>
-      <workItem from="1753720709910" duration="1137000" />
-      <workItem from="1753725569999" duration="5026000" />
-      <workItem from="1753784307453" duration="12975000" />
-      <workItem from="1753947661687" duration="2412000" />
-      <workItem from="1753951814506" duration="1389000" />
-      <workItem from="1754075815468" duration="5835000" />
-      <workItem from="1754084252348" duration="1504000" />
-      <workItem from="1754170326458" duration="564000" />
-      <workItem from="1754171023568" duration="465000" />
-      <workItem from="1754339491040" duration="2836000" />
+      <updated>1754412678365</updated>
+      <workItem from="1754412680986" duration="7000" />
+      <workItem from="1754412878298" duration="6525000" />
+      <workItem from="1754427799102" duration="6251000" />
     </task>
+    <task id="LOCAL-00001" summary="CrosshairScreenLocation pubblico">
+      <option name="closed" value="true" />
+      <created>1754429583139</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1754429583139</updated>
+    </task>
+    <task id="LOCAL-00002" summary="CrosshairScreenLocation pubblico">
+      <option name="closed" value="true" />
+      <created>1754429593742</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1754429593742</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -99,8 +131,21 @@
   </component>
   <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="false" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
   <component name="VcsManagerConfiguration">
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+    <MESSAGE value="CrosshairScreenLocation pubblico" />
+    <option name="LAST_COMMIT_MESSAGE" value="CrosshairScreenLocation pubblico" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -119,9 +164,5 @@
         </breakpoint>
       </breakpoints>
     </breakpoint-manager>
-  </component>
-  <component name="XSLT-Support.FileAssociations.UIState">
-    <expand />
-    <select />
   </component>
 </project>

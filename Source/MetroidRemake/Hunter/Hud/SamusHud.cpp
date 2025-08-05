@@ -22,7 +22,8 @@ void ASamusHud::DrawHUD()
 {
 	Super::DrawHUD();
 
-	const FVector2D Center(Canvas->ClipX*.5f, Canvas->ClipY*.5f);
+	const FVector2D Center = Cast<ASamus>(GetOwningPawn())->GetCrosshairLocation();
+	
 	FCanvasTileItem TileItem(Center, CrosshairTexture->Resource, FLinearColor::White);
 	TileItem.BlendMode = SE_BLEND_Translucent;
 	Canvas->DrawItem( TileItem );
